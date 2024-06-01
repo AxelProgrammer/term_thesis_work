@@ -21,6 +21,7 @@ from pyowm import OWM  # использование OpenWeatherMap для пол
 from googlesearch import search  # поиск в Google (performing searches on Google)
 from vosk import Model, KaldiRecognizer  # оффлайн-распознавание от Vosk (offline speech recognition by Vosk)
 
+load_dotenv()
 class Translation:
     with open("translations.json", "r", encoding="UTF-8") as file:
         translations = json.load(file)
@@ -165,6 +166,13 @@ def play_joke(*args: tuple):
     ]
     play_voice_assistant_speech(joke[random.randint(0, len(joke) - 1)])
 
+def listening(*args: tuple):
+    # случайное приветствие
+    listening = [
+        translator.get("I'm listening").format(person.name),
+        translator.get("I'm listening to you carefully").format(person.name)
+    ]
+    play_voice_assistant_speech(listening[random.randint(0, len(listening) - 1)])
 
 def play_farewell_and_quit(*args: tuple):
     # случайное прощание
@@ -298,58 +306,8 @@ def get_translation(*args: tuple):
         assistant.speech_language = old_assistant_language
         setup_assistant_voice()
 
-
-def get_weather_forecast(*args: tuple):
-    # Получение и озвучивание прогнза погоды
-
-    # в случае наличия дополнительного аргумента - запрос погоды происходит по нему,
-    # иначе - используется город, заданный в настройках
-    city_name = person.home_city
-
-    if args:
-        if args[0]:
-            city_name = args[0][0]
-
-    try:
-        # использование API-ключа, помещённого в .env-файл по примеру WEATHER_API_KEY = "01234abcd....."
-        weather_api_key = os.getenv("WEATHER_API_KEY")
-        open_weather_map = OWM(weather_api_key)
-
-        # запрос данных о текущем состоянии погоды
-        weather_manager = open_weather_map.weather_manager()
-        observation = weather_manager.weather_at_place(city_name)
-        weather = observation.weather
-
-    # поскольку все ошибки предсказать сложно, то будет произведен отлов с последующим выводом без остановки программы
-    except:
-        play_voice_assistant_speech(translator.get("Seems like we have a trouble. See logs for more information"))
-        traceback.print_exc()
-        return
-
-    # разбивание данных на части для удобства работы с ними
-    status = weather.detailed_status
-    temperature = weather.temperature('celsius')["temp"]
-    wind_speed = weather.wind()["speed"]
-    pressure = int(weather.pressure["press"] / 1.333)  # переведено из гПА в мм рт.ст.
-
-    # вывод логов
-    print(colored("Weather in " + city_name +
-                  ":\n * Status: " + status +
-                  "\n * Wind speed (m/sec): " + str(wind_speed) +
-                  "\n * Temperature (Celsius): " + str(temperature) +
-                  "\n * Pressure (mm Hg): " + str(pressure), "yellow"))
-
-    # озвучивание текущего состояния погоды ассистентом (здесь для мультиязычности требуется дополнительная работа)
-    play_voice_assistant_speech(translator.get("It is {0} in {1}").format(status, city_name))
-    play_voice_assistant_speech(translator.get("The temperature is {} degrees Celsius").format(str(temperature)))
-    play_voice_assistant_speech(translator.get("The wind speed is {} meters per second").format(str(wind_speed)))
-    play_voice_assistant_speech(translator.get("The pressure is {} mm Hg").format(str(pressure)))
-
-
 def change_language(*args: tuple):
-    """
-    Изменение языка голосового ассистента (языка распознавания речи)
-    """
+    # Изменение языка
     assistant.speech_language = "ru" if assistant.speech_language == "en" else "en"
     setup_assistant_voice()
     print(colored("Language switched to " + assistant.speech_language, "cyan"))
@@ -437,11 +395,6 @@ config = {
                          "find video", "find on youtube", "search on youtube"],
             "responses": search_for_video_on_youtube
         },
-        "weather_forecast": {
-            "examples": ["прогноз погоды", "какая погода",
-                         "weather forecast", "report weather"],
-            "responses": get_weather_forecast
-        },
         "translation": {
             "examples": ["выполни перевод", "переведи", "найди перевод",
                          "translate", "find translation"],
@@ -483,7 +436,8 @@ def get_intent(request):
     best_intent_probability = probabilities[index_of_best_intent]
 
     # при добавлении новых намерений стоит уменьшать этот показатель
-    print(best_intent_probability)
+    # близость к предсказанному значению
+    # print(best_intent_probability)
     if best_intent_probability > 0.157:
         return best_intent
 
@@ -527,43 +481,70 @@ def make_preparations():
     classifier = LinearSVC()
     prepare_corpus()
 
+def checking_offers(voice_input_parts):
+    if len(voice_input_parts) > 1:
+        for guess in range(len(voice_input_parts)):
+            intent = get_intent((" ".join(voice_input_parts[0:guess])).strip())
+            print(intent)
+            if intent:
+                command_options = [voice_input_parts[guess:len(voice_input_parts)]]
+                print(command_options)
+                config["intents"][intent]["responses"](*command_options)
+                break
+            if not intent and guess == len(voice_input_parts) - 1:
+                config["failure_phrases"]()
+
+def executing_commands():
+    voice_input_parts = voice_input.split(" ")
+
+    # если было сказано одно слово - выполняем команду сразу без дополнительных аргументов
+    if len(voice_input_parts) == 1:
+        intent = get_intent(voice_input)
+        if intent:
+            config["intents"][intent]["responses"]()
+        else:
+            config["failure_phrases"]()
+
+    # в случае длинной фразы - выполняется поиск ключевой фразы и аргументов через каждое слово,
+    # пока не будет найдено совпадение
+    checking_offers(voice_input_parts)
+
+def checking_the_input(voice_input):
+    if os.path.exists("microphone-results.wav"):
+        os.remove("microphone-results.wav")
+
+    print(colored(voice_input, "blue"))
 
 
 
 if __name__ == "__main__":
     make_preparations()
     while True:
-        # старт записи речи с последующим выводом распознанной речи и удалением записанного в микрофон аудио
+        # старт записи речи
         voice_input = record_and_recognize_audio()
+        checking_the_input(voice_input)
 
-        if os.path.exists("microphone-results.wav"):
-            os.remove("microphone-results.wav")
-
-        print(colored(voice_input, "blue"))
-
-        # отделение комманд от дополнительной информации (аргументов)
         if voice_input:
-            voice_input_parts = voice_input.split(" ")
+            per = voice_input.split(" ")
+            if(per[0] == "о'кей" and per[1] == "нова"):
+                print(colored("Активационная команда получена", "green"))
+                listening()
+                voice_input = record_and_recognize_audio()
 
-            # если было сказано одно слово - выполняем команду сразу без дополнительных аргументов
-            if len(voice_input_parts) == 1:
-                intent = get_intent(voice_input)
-                if intent:
-                    config["intents"][intent]["responses"]()
+                checking_the_input(voice_input)
+
+                # отделение комманд от дополнительной информации (аргументов)
+                if voice_input:
+                    executing_commands()
                 else:
-                    config["failure_phrases"]()
+                    while not voice_input:
+                        checking_the_input()
+                        voice_input = record_and_recognize_audio()
+                        if os.path.exists("microphone-results.wav"):
+                            os.remove("microphone-results.wav")
+                        print(colored(voice_input, "blue"))
+                    executing_commands()
 
-            # в случае длинной фразы - выполняется поиск ключевой фразы и аргументов через каждое слово,
-            # пока не будет найдено совпадение
-            if len(voice_input_parts) > 1:
-                for guess in range(len(voice_input_parts)):
-                    intent = get_intent((" ".join(voice_input_parts[0:guess])).strip())
-                    print(intent)
-                    if intent:
-                        command_options = [voice_input_parts[guess:len(voice_input_parts)]]
-                        print(command_options)
-                        config["intents"][intent]["responses"](*command_options)
-                        break
-                    if not intent and guess == len(voice_input_parts)-1:
-                        config["failure_phrases"]()
+            else:
+                print(colored("Ожидание активационной команды...", "yellow"))
 
