@@ -1,0 +1,98 @@
+{
+  "Please check if the microphone is working properly": {
+    "ru": "Пожалуйста, проверьте, правильно ли работает микрофон",
+    "en": "Please check if the microphone is working properly"
+  },
+  "What did you say again?": {
+    "ru": "Пожалуйста, повтори",
+    "en": "What did you say again?"
+  },
+  "Hello, {}! How can I help you today?": {
+    "ru": "Привет, {}! Чем могу помочь?",
+    "en": "Hello, {}! How can I help you today?"
+  },
+  "The current dollar exchange rate {}": {
+    "ru": "Текущий курс доллара {}",
+    "en": "The current dollar exchange rate {}"
+  },
+  "The current evra exchange rate {}": {
+    "ru": "Текущий курс евра {}",
+    "en": "The current evra exchange rate {}"
+  },
+  "The current bitcoin exchange rate {}": {
+    "ru": "Текущий курс биткойна {}",
+    "en": "The current bitcoin exchange rate {}"
+  },
+  "The file is open": {
+    "ru": "Файл открыт",
+    "en": "The file is open"
+  },
+  "The file has been translated and is located in {}": {
+    "ru": "Файл был переведен и находится в {}",
+    "en": "The file has been translated and is located in {}"
+  },
+  "Good day to you {}! How can I help you today?": {
+    "ru": "Здравствуй, {}! Какой план на сегодня?",
+    "en": "Good day to you {}! How can I help you today?"
+  },
+   "Why did the robot get angry? Everyone kept pushing their buttons!": {
+    "ru": "Почему робот разозлился? Каждый продолжал нажимать на свои кнопки!",
+    "en": "Why did the robot get angry? Everyone kept pushing their buttons!"
+  },
+  "Be careful of robots! They byte!": {
+    "ru": "Будьте осторожны с роботами! Они байтят!",
+    "en": "Be careful of robots! They byte!"
+  },
+  "Goodbye, {}! Have a nice day!": {
+    "ru": "До связи, {}! Хорошего тебе дня!",
+    "en": "Goodbye, {}! Have a nice day!"
+  },
+  "See you soon, {}!": {
+    "ru": "До скорого, {}!",
+    "en": "See you soon, {}!"
+  },
+  "Here is what I found for {} on google": {
+    "ru": "Вот, что мне удалось найти по запросу {} в Гугл",
+    "en": "Here is what I found for {} on google"
+  },
+  "Here is what I found for {} on youtube": {
+    "ru": "Вот, что мне удалось найти по запросу {} на Ютьюб",
+    "en": "Here is what I found for {} on youtube"
+  },
+  "Here is what I found for {} on Wikipedia": {
+    "ru": "Вот, что мне удалось найти по запросу {} в Википедии",
+    "en": "Here is what I found for {} on Wikipedia"
+  },
+  "Can't find {} on Wikipedia. But here is what I found on google": {
+    "ru": "Не могу найти в Википедии ничего по запросу {}. Но вот, что мне удалось найти в Гугл",
+    "en": "Can't find {} on Wikipedia. But here is what I found on google"
+  },
+  "Here is what I found for {} on social nets": {
+    "ru": "Вот, что мне удалось найти по запросу {} в социальных сетях",
+    "en": "Here is what I found for {} on social nets"
+  },
+  "I'm listening": {
+    "ru": "Я слушаю",
+    "en": "I'm listening"
+  },
+  "I'm listening to you carefully": {
+    "ru": "Слушаю вас внимательно",
+    "en": "I'm listening to you carefully"
+  },
+  "won": {
+    "ru": "победили",
+    "en": "won"
+  },
+  "Tails": {
+    "ru": "Решки",
+    "en": "Tails"
+  },
+  "Heads": {
+    "ru": "Орлы",
+    "en": "Heads"
+  },
+  "Can you repeat, please?": {
+    "ru": "Можешь повторить?",
+    "en": "Can you repeat, please?"
+  }
+}
