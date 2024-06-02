@@ -1,0 +1,7 @@
+Artificial Intelligence (AI) is a field of computer science dedicated to
+creating machines that can perform tasks that would typically require human
+intelligence, such as learning, problem-solving, perception, and decision-making.
+In recent years, AI has made significant strides, and its growing impact on various
+aspects of our lives is becoming increasingly evident. From recommending the next
+movie to watch on Netflix to suggesting which route to take on Google Maps, AI is
+revolutionizing the way we interact with technology.
